@@ -4,7 +4,8 @@ import pandas as pd
 import numpy as np
 from flask import Flask, request, jsonify, send_from_directory
 
-app = Flask(__name__, static_folder="public", static_url_path="")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+app = Flask(__name__, static_folder=os.path.join(BASE_DIR, "public"), static_url_path="")
 
 MODEL_DIR = os.path.join(os.path.dirname(__file__), "saved_models")
 
@@ -32,7 +33,8 @@ def add_cors_headers(response):
 def handle_options(path=""):
     return "", 204
 
-FRONTEND_DIST = os.path.join(os.path.dirname(__file__), "frontend", "dist")
+FRONTEND_DIST = os.path.join(BASE_DIR, "frontend", "dist")
+PUBLIC_DIR = os.path.join(BASE_DIR, "public")
 
 @app.route("/", defaults={"path": ""})
 @app.route("/<path:path>")
@@ -44,7 +46,11 @@ def serve(path):
         if path != "" and os.path.exists(target):
             return send_from_directory(FRONTEND_DIST, path)
         return send_from_directory(FRONTEND_DIST, "index.html")
-    return send_from_directory("public", path if path and os.path.exists(os.path.join("public", path)) else "index.html")
+    # Fallback: serve from public/
+    public_file = os.path.join(PUBLIC_DIR, path) if path else ""
+    if path and os.path.exists(public_file):
+        return send_from_directory(PUBLIC_DIR, path)
+    return send_from_directory(PUBLIC_DIR, "index.html")
 
 @app.route("/api/predict", methods=["POST"])
 def predict():
