@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinPulse AI | Next-Gen Loan Default Risk Intelligence</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-dark: #090d16;
+            --bg-card: rgba(18, 26, 43, 0.75);
+            --bg-card-hover: rgba(28, 39, 64, 0.85);
+            --border-glass: rgba(255, 255, 255, 0.08);
+            --border-glow: rgba(6, 182, 212, 0.3);
+            --cyan: #06b6d4;
+            --cyan-glow: rgba(6, 182, 212, 0.4);
+            --indigo: #6366f1;
+            --purple: #8b5cf6;
+            --emerald: #10b981;
+            --emerald-bg: rgba(16, 185, 129, 0.15);
+            --rose: #f43f5e;
+            --rose-bg: rgba(244, 63, 94, 0.15);
+            --amber: #f59e0b;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --radius-lg: 20px;
+            --radius-md: 12px;
+            --font-heading: 'Outfit', sans-serif;
+            --font-body: 'Inter', sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            background-image: 
+                radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.15) 0%, transparent 45%),
+                radial-gradient(circle at 85% 85%, rgba(6, 182, 212, 0.12) 0%, transparent 50%);
+            color: var(--text-main);
+            font-family: var(--font-body);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Top Navbar */
+        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 18px 40px;
+            background: rgba(9, 13, 22, 0.8);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border-glass);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--cyan), var(--indigo));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #fff;
+            box-shadow: 0 0 20px var(--cyan-glow);
+        }
+
+        .brand-text h1 {
+            font-family: var(--font-heading);
+            font-size: 1.4rem;
+            font-weight: 800;
+            background: linear-gradient(90deg, #fff, #a5f3fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-text p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            letter-spacing: 0.5px;
+        }
+
+        .nav-controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .model-select-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 6px 14px;
+            border-radius: 30px;
+            border: 1px solid var(--border-glass);
+        }
+
+        .model-select-wrapper label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        select, input, button {
+            font-family: inherit;
+        }
+
+        .styled-select {
+            background: transparent;
+            color: #fff;
+            border: none;
+            outline: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .styled-select option {
+            background: #111827;
+            color: #fff;
+        }
+
+        /* Container Layout */
+        .main-layout {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 25px;
+        }
+
+        /* Preset Ribbon */
+        .preset-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 25px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+
+        .preset-label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            white-space: nowrap;
+        }
+
+        .preset-chip {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border-glass);
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #cbd5e1;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+        }
+
+        .preset-chip:hover, .preset-chip.active {
+            background: linear-gradient(135deg, rgba(6, 182, 212, 0.2), rgba(99, 102, 241, 0.2));
+            border-color: var(--cyan);
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(6, 182, 212, 0.2);
+        }
+
+        /* Main Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 25px;
+        }
+
+        @media (max-width: 1024px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Glass Cards */
+        .card {
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            margin-bottom: 25px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            transition: border-color 0.3s ease;
+        }
+
+        .card:hover {
+            border-color: rgba(255, 255, 255, 0.15);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 22px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border-glass);
+        }
+
+        .card-title {
+            font-family: var(--font-heading);
+            font-size: 1.2rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #fff;
+        }
+
+        .card-title i {
+            color: var(--cyan);
+        }
+
+        /* Step Wizard Navigation */
+        .wizard-steps {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            position: relative;
+        }
+
+        .wizard-steps::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.08);
+            z-index: 1;
+            transform: translateY(-50%);
+        }
+
+        .wizard-step {
+            position: relative;
+            z-index: 2;
+            background: var(--bg-dark);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .wizard-step.active {
+            border-color: var(--cyan);
+            background: linear-gradient(135deg, var(--cyan), var(--indigo));
+            color: #fff;
+            box-shadow: 0 0 15px var(--cyan-glow);
+        }
+
+        .wizard-step.completed {
+            border-color: var(--emerald);
+            background: var(--emerald);
+            color: #fff;
+        }
+
+        .step-panel {
+            display: none;
+            animation: fadeIn 0.35s ease-in-out;
+        }
+
+        .step-panel.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Form Controls */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        @media (max-width: 640px) {
+            .form-grid { grid-template-columns: 1fr; }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #cbd5e1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .form-group label span.val-badge {
+            color: var(--cyan);
+            font-weight: 700;
+        }
+
+        .input-control {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-md);
+            padding: 12px 16px;
+            color: #fff;
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.25s ease;
+        }
+
+        .input-control:focus {
+            border-color: var(--cyan);
+            box-shadow: 0 0 12px var(--cyan-glow);
+            background: rgba(15, 23, 42, 0.9);
+        }
+
+        /* Button controls */
+        .btn-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 25px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border-radius: var(--radius-md);
+            font-weight: 600;
+            font-size: 0.95rem;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.25s ease;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--cyan), var(--indigo));
+            color: #fff;
+            box-shadow: 0 8px 20px rgba(6, 182, 212, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(6, 182, 212, 0.5);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text-muted);
+            border: 1px solid var(--border-glass);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: #fff;
+        }
+
+        /* Risk Gauge & Result Banner */
+        .gauge-container {
+            position: relative;
+            width: 240px;
+            height: 140px;
+            margin: 0 auto 20px;
+        }
+
+        .result-banner {
+            border-radius: var(--radius-md);
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .result-banner.low-risk {
+            background: var(--emerald-bg);
+            border: 1px solid var(--emerald);
+        }
+
+        .result-banner.high-risk {
+            background: var(--rose-bg);
+            border: 1px solid var(--rose);
+        }
+
+        .result-status-title {
+            font-family: var(--font-heading);
+            font-size: 1.5rem;
+            font-weight: 800;
+        }
+
+        .result-status-title.low-risk { color: var(--emerald); }
+        .result-status-title.high-risk { color: var(--rose); }
+
+        .metric-cards-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .mini-kpi {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border-glass);
+            padding: 12px;
+            border-radius: var(--radius-md);
+            text-align: center;
+        }
+
+        .mini-kpi-val {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #fff;
+        }
+
+        .mini-kpi-lbl {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        /* Risk Flags & Recommendations */
+        .list-box {
+            background: rgba(15, 23, 42, 0.4);
+            border: 1px solid var(--border-glass);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            margin-bottom: 15px;
+        }
+
+        .list-box-title {
+            font-size: 0.9rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: var(--cyan);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .list-item {
+            font-size: 0.85rem;
+            color: #cbd5e1;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .list-item i { margin-top: 3px; }
+
+        /* Paginated Dataset Table Section */
+        .table-container {
+            width: 100%;
+            overflow-x: auto;
+            margin-bottom: 15px;
+        }
+
+        .custom-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+        }
+
+        .custom-table th {
+            background: rgba(255, 255, 255, 0.04);
+            padding: 12px 16px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-glass);
+        }
+
+        .custom-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border-glass);
+            color: #e2e8f0;
+        }
+
+        .custom-table tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .badge-status {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .badge-repaid { background: var(--emerald-bg); color: var(--emerald); border: 1px solid var(--emerald); }
+        .badge-default { background: var(--rose-bg); color: var(--rose); border: 1px solid var(--rose); }
+
+        /* Pagination Bar Controls */
+        .pagination-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 15px;
+            border-top: 1px solid var(--border-glass);
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .page-info {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .page-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border-glass);
+            color: #fff;
+            min-width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .page-btn:hover:not(:disabled), .page-btn.active {
+            background: var(--cyan);
+            color: #090d16;
+            border-color: var(--cyan);
+        }
+
+        .page-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .search-box-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <a href="#" class="brand">
+            <div class="brand-icon"><i class="fa-solid fa-brain"></i></div>
+            <div class="brand-text">
+                <h1>FinPulse AI</h1>
+                <p>LOAN DEFAULT RISK PLATFORM</p>
+            </div>
+        </a>
+        <div class="nav-controls">
+            <div class="model-select-wrapper">
+                <i class="fa-solid fa-microchip" style="color: var(--cyan);"></i>
+                <label>AI Model:</label>
+                <select id="modelSelect" class="styled-select" onchange="runEvaluation()">
+                    <option value="rf">Random Forest Classifier (Ensemble)</option>
+                    <option value="lr">Logistic Regression (Linear)</option>
+                </select>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="main-layout">
+
+        <!-- Preset Quick Bar -->
+        <div class="preset-bar">
+            <span class="preset-label"><i class="fa-solid fa-bolt" style="color: var(--amber);"></i> Quick Profiles:</span>
+            <div class="preset-chip active" onclick="loadPreset('prime', this)">
+                <i class="fa-solid fa-shield-check" style="color: var(--emerald);"></i> Prime Applicant (Low Risk)
+            </div>
+            <div class="preset-chip" onclick="loadPreset('moderate', this)">
+                <i class="fa-solid fa-user-check" style="color: var(--amber);"></i> Moderate Credit Applicant
+            </div>
+            <div class="preset-chip" onclick="loadPreset('high_risk', this)">
+                <i class="fa-solid fa-triangle-exclamation" style="color: var(--rose);"></i> High Risk Borrower
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="content-grid">
+
+            <!-- Left Column: Multi-Step Evaluation Wizard -->
+            <div>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">
+                            <i class="fa-solid fa-sliders"></i> Applicant Risk Evaluation Wizard
+                        </div>
+                        <span id="currentStepLabel" style="font-size: 0.85rem; color: var(--cyan); font-weight: 600;">Step 1 of 3</span>
+                    </div>
+
+                    <!-- Wizard Step Indicator -->
+                    <div class="wizard-steps">
+                        <div class="wizard-step active" onclick="goToStep(1)" id="stepNum1">1</div>
+                        <div class="wizard-step" onclick="goToStep(2)" id="stepNum2">2</div>
+                        <div class="wizard-step" onclick="goToStep(3)" id="stepNum3">3</div>
+                    </div>
+
+                    <form id="evaluationForm" onsubmit="event.preventDefault(); runEvaluation();">
+                        
+                        <!-- Step 1: Personal Profile -->
+                        <div class="step-panel active" id="step1">
+                            <h4 style="margin-bottom: 15px; color: #fff; font-size: 1rem;"><i class="fa-solid fa-user" style="color: var(--cyan);"></i> Personal Details</h4>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>Age <span class="val-badge" id="ageVal">42</span></label>
+                                    <input type="range" class="input-control" id="Age" min="18" max="85" value="42" oninput="document.getElementById('ageVal').innerText = this.value">
+                                </div>
+                                <div class="form-group">
+                                    <label>Education Level</label>
+                                    <select class="input-control" id="Education">
+                                        <option value="Bachelor's" selected>Bachelor's Degree</option>
+                                        <option value="Master's">Master's Degree</option>
+                                        <option value="PhD">Doctorate (PhD)</option>
+                                        <option value="High School">High School Diploma</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Marital Status</label>
+                                    <select class="input-control" id="MaritalStatus">
+                                        <option value="Married" selected>Married</option>
+                                        <option value="Single">Single</option>
+                                        <option value="Divorced">Divorced</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Has Dependents?</label>
+                                    <select class="input-control" id="HasDependents">
+                                        <option value="No" selected>No Dependents</option>
+                                        <option value="Yes">Yes, Has Dependents</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="btn-row">
+                                <div></div>
+                                <button type="button" class="btn btn-primary" onclick="goToStep(2)">Next: Financial Health <i class="fa-solid fa-arrow-right"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Financial & Employment -->
+                        <div class="step-panel" id="step2">
+                            <h4 style="margin-bottom: 15px; color: #fff; font-size: 1rem;"><i class="fa-solid fa-briefcase" style="color: var(--cyan);"></i> Employment & Financial Health</h4>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>Employment Status</label>
+                                    <select class="input-control" id="EmploymentType">
+                                        <option value="Full-time" selected>Full-time Employed</option>
+                                        <option value="Part-time">Part-time Employed</option>
+                                        <option value="Self-employed">Self-employed</option>
+                                        <option value="Unemployed">Unemployed</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Months Employed</label>
+                                    <input type="number" class="input-control" id="MonthsEmployed" value="60" min="0" max="600">
+                                </div>
+                                <div class="form-group">
+                                    <label>Annual Income ($)</label>
+                                    <input type="number" class="input-control" id="Income" value="85000" step="5000">
+                                </div>
+                                <div class="form-group">
+                                    <label>FICO Credit Score <span class="val-badge" id="creditVal">760</span></label>
+                                    <input type="range" class="input-control" id="CreditScore" min="300" max="850" value="760" oninput="document.getElementById('creditVal').innerText = this.value">
+                                </div>
+                                <div class="form-group">
+                                    <label>Open Credit Lines</label>
+                                    <input type="number" class="input-control" id="NumCreditLines" value="2" min="1" max="15">
+                                </div>
+                                <div class="form-group">
+                                    <label>Debt-to-Income (DTI) Ratio <span class="val-badge" id="dtiVal">0.25</span></label>
+                                    <input type="range" class="input-control" id="DTIRatio" min="0.0" max="1.0" step="0.01" value="0.25" oninput="document.getElementById('dtiVal').innerText = this.value">
+                                </div>
+                            </div>
+                            <div class="btn-row">
+                                <button type="button" class="btn btn-secondary" onclick="goToStep(1)"><i class="fa-solid fa-arrow-left"></i> Previous</button>
+                                <button type="button" class="btn btn-primary" onclick="goToStep(3)">Next: Loan Structure <i class="fa-solid fa-arrow-right"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Loan Structure -->
+                        <div class="step-panel" id="step3">
+                            <h4 style="margin-bottom: 15px; color: #fff; font-size: 1rem;"><i class="fa-solid fa-landmark" style="color: var(--cyan);"></i> Loan Request Structure</h4>
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>Loan Amount Requested ($)</label>
+                                    <input type="number" class="input-control" id="LoanAmount" value="35000" step="5000">
+                                </div>
+                                <div class="form-group">
+                                    <label>Interest Rate (%) <span class="val-badge" id="rateVal">6.5%</span></label>
+                                    <input type="range" class="input-control" id="InterestRate" min="1.0" max="30.0" step="0.25" value="6.5" oninput="document.getElementById('rateVal').innerText = this.value + '%'">
+                                </div>
+                                <div class="form-group">
+                                    <label>Loan Repayment Term</label>
+                                    <select class="input-control" id="LoanTerm">
+                                        <option value="12">12 Months (1 Year)</option>
+                                        <option value="24">24 Months (2 Years)</option>
+                                        <option value="36" selected>36 Months (3 Years)</option>
+                                        <option value="48">48 Months (4 Years)</option>
+                                        <option value="60">60 Months (5 Years)</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Loan Purpose</label>
+                                    <select class="input-control" id="LoanPurpose">
+                                        <option value="Home" selected>Home Mortgage / Remodel</option>
+                                        <option value="Auto">Auto Loan</option>
+                                        <option value="Business">Business Expansion</option>
+                                        <option value="Education">Education</option>
+                                        <option value="Other">Other Personal</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Has Existing Mortgage?</label>
+                                    <select class="input-control" id="HasMortgage">
+                                        <option value="Yes" selected>Yes</option>
+                                        <option value="No">No</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Has Co-Signer?</label>
+                                    <select class="input-control" id="HasCoSigner">
+                                        <option value="Yes" selected>Yes</option>
+                                        <option value="No">No</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="btn-row">
+                                <button type="button" class="btn btn-secondary" onclick="goToStep(2)"><i class="fa-solid fa-arrow-left"></i> Previous</button>
+                                <button type="submit" class="btn btn-primary"><i class="fa-solid fa-gauge-high"></i> Evaluate Risk Now</button>
+                            </div>
+                        </div>
+
+                    </form>
+                </div>
+            </div>
+
+            <!-- Right Column: Real-Time Results & Diagnostic Gauge -->
+            <div>
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title"><i class="fa-solid fa-chart-pie"></i> Risk Evaluation Outcome</div>
+                        <span id="modelBadge" class="badge-status badge-repaid">Random Forest</span>
+                    </div>
+
+                    <!-- Dynamic Result Banner -->
+                    <div id="resultBanner" class="result-banner low-risk">
+                        <div id="resultIcon" style="font-size: 2.5rem; margin-bottom: 6px;"><i class="fa-solid fa-circle-check" style="color: var(--emerald);"></i></div>
+                        <div id="resultStatus" class="result-status-title low-risk">LOW DEFAULT RISK</div>
+                        <p id="resultSub" style="font-size: 0.85rem; color: #a7f3d0; margin-top: 4px;">Applicant meets low-risk thresholds. Recommended for approval.</p>
+                    </div>
+
+                    <!-- Gauge Canvas Chart -->
+                    <div class="gauge-container">
+                        <canvas id="gaugeCanvas" width="240" height="140"></canvas>
+                        <div id="gaugeScoreText" style="text-align: center; margin-top: -30px; font-size: 1.6rem; font-weight: 800; color: #fff;">18.5%</div>
+                        <div style="text-align: center; font-size: 0.75rem; color: var(--text-muted);">DEFAULT PROBABILITY</div>
+                    </div>
+
+                    <!-- Mini KPI Summary Grid -->
+                    <div class="metric-cards-grid">
+                        <div class="mini-kpi">
+                            <div class="mini-kpi-val" id="kpiPmt">$1,072</div>
+                            <div class="mini-kpi-lbl">Est. Payment</div>
+                        </div>
+                        <div class="mini-kpi">
+                            <div class="mini-kpi-val" id="kpiLti">41.2%</div>
+                            <div class="mini-kpi-lbl">Loan-to-Income</div>
+                        </div>
+                        <div class="mini-kpi">
+                            <div class="mini-kpi-val" id="kpiRiskCategory" style="color: var(--emerald);">Low Risk</div>
+                            <div class="mini-kpi-lbl">Risk Tier</div>
+                        </div>
+                    </div>
+
+                    <!-- Risk Drivers List -->
+                    <div class="list-box">
+                        <div class="list-box-title"><i class="fa-solid fa-triangle-exclamation"></i> Identified Risk Factors</div>
+                        <div id="riskFlagsList">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Recommendations List -->
+                    <div class="list-box">
+                        <div class="list-box-title" style="color: var(--emerald);"><i class="fa-solid fa-lightbulb"></i> Actionable Underwriting Advice</div>
+                        <div id="recommendationsList">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div> <!-- End Grid -->
+
+
+        <!-- Paginated Applicants Table Section -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-title">
+                    <i class="fa-solid fa-table-list"></i> Paginated Applicants Evaluation Records
+                </div>
+                <div class="search-box-wrapper">
+                    <input type="text" class="input-control" id="searchInput" placeholder="Search Loan ID, Education..." style="padding: 6px 14px; font-size: 0.85rem; width: 220px;" oninput="fetchPaginatedData(1)">
+                    <select id="riskFilter" class="input-control" style="padding: 6px 10px; font-size: 0.85rem; width: 140px;" onchange="fetchPaginatedData(1)">
+                        <option value="all">All Risks</option>
+                        <option value="lowrisk">Low Risk</option>
+                        <option value="highrisk">High Risk</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table class="custom-table">
+                    <thead>
+                        <tr>
+                            <th>Loan ID</th>
+                            <th>Age</th>
+                            <th>Income ($)</th>
+                            <th>Loan Amount ($)</th>
+                            <th>Credit Score</th>
+                            <th>Interest Rate</th>
+                            <th>Education</th>
+                            <th>Employment</th>
+                            <th>Default Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- Populated by JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Proper Pagination Bar -->
+            <div class="pagination-bar">
+                <div class="page-info" id="paginationInfo">
+                    Showing 1 to 10 of 200 records
+                </div>
+                <div class="pagination-controls" id="paginationButtons">
+                    <!-- Page buttons 1, 2, 3, Next generated by JS -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Application Javascript Logic -->
+    <script>
+        let currentPage = 1;
+        const pageLimit = 8;
+
+        // Step Navigation
+        function goToStep(step) {
+            document.querySelectorAll('.step-panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.wizard-step').forEach(s => s.classList.remove('active'));
+
+            document.getElementById(`step${step}`).classList.add('active');
+            document.getElementById(`stepNum${step}`).classList.add('active');
+            document.getElementById('currentStepLabel').innerText = `Step ${step} of 3`;
+
+            for(let i=1; i<step; i++) {
+                document.getElementById(`stepNum${i}`).classList.add('completed');
+            }
+        }
+
+        // Preset Loaders
+        function loadPreset(type, element) {
+            document.querySelectorAll('.preset-chip').forEach(c => c.classList.remove('active'));
+            element.classList.add('active');
+
+            if(type === 'prime') {
+                setFormValues(45, "Master's", "Married", "Yes", "Full-time", 96, 120000, 810, 2, 0.18, 30000, 5.0, 36, "Home", "Yes", "Yes");
+            } else if(type === 'moderate') {
+                setFormValues(34, "Bachelor's", "Single", "No", "Full-time", 24, 55000, 640, 4, 0.42, 65000, 12.5, 48, "Auto", "No", "No");
+            } else if(type === 'high_risk') {
+                setFormValues(22, "High School", "Divorced", "Yes", "Unemployed", 6, 24000, 480, 8, 0.75, 140000, 21.0, 60, "Business", "No", "No");
+            }
+
+            runEvaluation();
+        }
+
+        function setFormValues(age, edu, marital, dep, emp, mEmp, inc, cScore, cLines, dti, loanAmt, rate, term, purpose, mort, cosigner) {
+            document.getElementById('Age').value = age;
+            document.getElementById('ageVal').innerText = age;
+            document.getElementById('Education').value = edu;
+            document.getElementById('MaritalStatus').value = marital;
+            document.getElementById('HasDependents').value = dep;
+            document.getElementById('EmploymentType').value = emp;
+            document.getElementById('MonthsEmployed').value = mEmp;
+            document.getElementById('Income').value = inc;
+            document.getElementById('CreditScore').value = cScore;
+            document.getElementById('creditVal').innerText = cScore;
+            document.getElementById('NumCreditLines').value = cLines;
+            document.getElementById('DTIRatio').value = dti;
+            document.getElementById('dtiVal').innerText = dti;
+            document.getElementById('LoanAmount').value = loanAmt;
+            document.getElementById('InterestRate').value = rate;
+            document.getElementById('rateVal').innerText = rate + '%';
+            document.getElementById('LoanTerm').value = term;
+            document.getElementById('LoanPurpose').value = purpose;
+            document.getElementById('HasMortgage').value = mort;
+            document.getElementById('HasCoSigner').value = cosigner;
+        }
+
+        // Run Evaluation via Flask API
+        async function runEvaluation() {
+            const modelChoice = document.getElementById('modelSelect').value;
+            const payload = {
+                model: modelChoice,
+                Age: document.getElementById('Age').value,
+                Education: document.getElementById('Education').value,
+                MaritalStatus: document.getElementById('MaritalStatus').value,
+                HasDependents: document.getElementById('HasDependents').value,
+                EmploymentType: document.getElementById('EmploymentType').value,
+                MonthsEmployed: document.getElementById('MonthsEmployed').value,
+                Income: document.getElementById('Income').value,
+                CreditScore: document.getElementById('CreditScore').value,
+                NumCreditLines: document.getElementById('NumCreditLines').value,
+                DTIRatio: document.getElementById('DTIRatio').value,
+                LoanAmount: document.getElementById('LoanAmount').value,
+                InterestRate: document.getElementById('InterestRate').value,
+                LoanTerm: document.getElementById('LoanTerm').value,
+                LoanPurpose: document.getElementById('LoanPurpose').value,
+                HasMortgage: document.getElementById('HasMortgage').value,
+                HasCoSigner: document.getElementById('HasCoSigner').value
+            };
+
+            try {
+                const res = await fetch('/api/predict', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const data = await res.json();
+
+                if(data.status === 'success') {
+                    updateUIResults(data, modelChoice);
+                }
+            } catch(e) {
+                console.error("API error:", e);
+            }
+        }
+
+        function updateUIResults(data, modelChoice) {
+            const isDefault = data.prediction === 1;
+            const banner = document.getElementById('resultBanner');
+            const statusTitle = document.getElementById('resultStatus');
+            const statusSub = document.getElementById('resultSub');
+            const icon = document.getElementById('resultIcon');
+
+            document.getElementById('modelBadge').innerText = modelChoice === 'rf' ? 'Random Forest' : 'Logistic Regression';
+
+            if(isDefault) {
+                banner.className = 'result-banner high-risk';
+                statusTitle.className = 'result-status-title high-risk';
+                statusTitle.innerText = 'HIGH DEFAULT RISK';
+                statusSub.innerText = 'High likelihood of default detected. Additional review or co-signer required.';
+                icon.innerHTML = '<i class="fa-solid fa-triangle-exclamation" style="color: var(--rose);"></i>';
+            } else {
+                banner.className = 'result-banner low-risk';
+                statusTitle.className = 'result-status-title low-risk';
+                statusTitle.innerText = 'LOW DEFAULT RISK';
+                statusSub.innerText = 'Applicant meets low-risk thresholds. Recommended for approval.';
+                icon.innerHTML = '<i class="fa-solid fa-circle-check" style="color: var(--emerald);"></i>';
+            }
+
+            document.getElementById('gaugeScoreText').innerText = `${data.default_risk_score}%`;
+            document.getElementById('kpiPmt').innerText = `$${data.monthly_payment.toLocaleString()}`;
+            document.getElementById('kpiLti').innerText = `${data.loan_to_income}%`;
+            document.getElementById('kpiRiskCategory').innerText = data.risk_category;
+            document.getElementById('kpiRiskCategory').style.color = isDefault ? 'var(--rose)' : 'var(--emerald)';
+
+            drawGauge(data.default_risk_score);
+
+            // Risk Flags
+            const flagsContainer = document.getElementById('riskFlagsList');
+            if(data.risk_flags.length > 0) {
+                flagsContainer.innerHTML = data.risk_flags.map(f => `
+                    <div class="list-item">
+                        <i class="fa-solid fa-circle-exclamation" style="color: ${f.level==='high'?'var(--rose)':'var(--amber)'};"></i>
+                        <span>${f.text}</span>
+                    </div>
+                `).join('');
+            } else {
+                flagsContainer.innerHTML = '<div class="list-item"><i class="fa-solid fa-circle-check" style="color: var(--emerald);"></i><span>No critical risk flags detected in profile!</span></div>';
+            }
+
+            // Recommendations
+            const recContainer = document.getElementById('recommendationsList');
+            recContainer.innerHTML = data.recommendations.map(r => `
+                <div class="list-item">
+                    <i class="fa-solid fa-check" style="color: var(--cyan);"></i>
+                    <span>${r}</span>
+                </div>
+            `).join('');
+        }
+
+        // Draw Canvas Gauge Chart
+        function drawGauge(score) {
+            const canvas = document.getElementById('gaugeCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height - 20;
+            const radius = 90;
+
+            // Background Arc
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, Math.PI, 2 * Math.PI, false);
+            ctx.lineWidth = 16;
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+            ctx.stroke();
+
+            // Colored Score Arc
+            const scoreAngle = Math.PI + (score / 100) * Math.PI;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, Math.PI, scoreAngle, false);
+            ctx.lineWidth = 16;
+
+            let strokeColor = '#10b981'; // emerald
+            if(score > 30 && score <= 60) strokeColor = '#f59e0b'; // amber
+            if(score > 60) strokeColor = '#f43f5e'; // rose
+
+            ctx.strokeStyle = strokeColor;
+            ctx.lineCap = 'round';
+            ctx.stroke();
+        }
+
+        // Fetch Paginated Applicant Records
+        async function fetchPaginatedData(page) {
+            currentPage = page;
+            const search = document.getElementById('searchInput').value;
+            const risk = document.getElementById('riskFilter').value;
+
+            try {
+                const res = await fetch(`/api/sample-dataset?page=${page}&limit=${pageLimit}&search=${search}&risk=${risk}`);
+                const data = await res.json();
+
+                if(data.status === 'success') {
+                    renderTable(data.data);
+                    renderPagination(data.page, data.total_pages, data.total_records);
+                }
+            } catch(e) {
+                console.error("Pagination error:", e);
+            }
+        }
+
+        function renderTable(records) {
+            const tbody = document.getElementById('tableBody');
+            if(records.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="10" style="text-align: center; color: var(--text-muted); padding: 20px;">No records found matching criteria</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = records.map(r => `
+                <tr>
+                    <td style="font-weight: 700; color: var(--cyan);">${r.id}</td>
+                    <td>${r.age}</td>
+                    <td>$${r.income.toLocaleString()}</td>
+                    <td>$${r.loanAmount.toLocaleString()}</td>
+                    <td><span style="font-weight: 600;">${r.creditScore}</span></td>
+                    <td>${r.interestRate}%</td>
+                    <td>${r.education}</td>
+                    <td>${r.employment}</td>
+                    <td>
+                        <span class="badge-status ${r.defaultStatus==='Default'?'badge-default':'badge-repaid'}">
+                            ${r.riskLevel}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn btn-secondary" style="padding: 4px 10px; font-size: 0.75rem;" onclick="quickInspect('${r.education}', '${r.employment}', ${r.income}, ${r.loanAmount}, ${r.creditScore})">
+                            <i class="fa-solid fa-eye"></i> Load
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function renderPagination(page, totalPages, totalRecords) {
+            const start = (page - 1) * pageLimit + 1;
+            const end = Math.min(page * pageLimit, totalRecords);
+            document.getElementById('paginationInfo').innerText = `Showing ${totalRecords > 0 ? start : 0} to ${end} of ${totalRecords} records`;
+
+            const btnContainer = document.getElementById('paginationButtons');
+            let btns = [];
+
+            // Prev button
+            btns.push(`<button class="page-btn" ${page <= 1 ? 'disabled' : ''} onclick="fetchPaginatedData(${page - 1})"><i class="fa-solid fa-chevron-left"></i></button>`);
+
+            for(let i = 1; i <= totalPages; i++) {
+                if(i === 1 || i === totalPages || (i >= page - 1 && i <= page + 1)) {
+                    btns.push(`<button class="page-btn ${i === page ? 'active' : ''}" onclick="fetchPaginatedData(${i})">${i}</button>`);
+                } else if(i === page - 2 || i === page + 2) {
+                    btns.push(`<span style="color: var(--text-muted); font-size: 0.8rem;">...</span>`);
+                }
+            }
+
+            // Next button
+            btns.push(`<button class="page-btn" ${page >= totalPages ? 'disabled' : ''} onclick="fetchPaginatedData(${page + 1})"><i class="fa-solid fa-chevron-right"></i></button>`);
+
+            btnContainer.innerHTML = btns.join('');
+        }
+
+        function quickInspect(edu, emp, inc, loan, score) {
+            document.getElementById('Education').value = edu;
+            document.getElementById('EmploymentType').value = emp;
+            document.getElementById('Income').value = inc;
+            document.getElementById('LoanAmount').value = loan;
+            document.getElementById('CreditScore').value = score;
+            document.getElementById('creditVal').innerText = score;
+            runEvaluation();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Initial Execution
+        window.onload = () => {
+            runEvaluation();
+            fetchPaginatedData(1);
+        };
+    </script>
+</body>
+</html>
