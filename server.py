@@ -1,8 +1,18 @@
 import os
+import mimetypes
 import joblib
 import pandas as pd
 import numpy as np
 from flask import Flask, request, jsonify, send_from_directory
+
+# Fix MIME types — Python's mimetypes module is incomplete on Linux/Vercel
+mimetypes.add_type('application/javascript', '.js')
+mimetypes.add_type('application/javascript', '.mjs')
+mimetypes.add_type('text/css', '.css')
+mimetypes.add_type('image/svg+xml', '.svg')
+mimetypes.add_type('image/png', '.png')
+mimetypes.add_type('image/webp', '.webp')
+
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 app = Flask(__name__, static_folder=os.path.join(BASE_DIR, "public"), static_url_path="")
